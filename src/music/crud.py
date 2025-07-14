@@ -15,7 +15,7 @@ def add_music(session_db, user_id: int, title: str, genre: str, info: str) -> Mu
     return result
 
 def get_music(session_db,
-              where: list,
+              where: list = [1 == 1],
               offset: int = 0,
               limit: int = 10,
               sorting: list[tuple[str, bool]] = None,

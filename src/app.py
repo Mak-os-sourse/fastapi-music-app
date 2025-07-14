@@ -4,10 +4,12 @@ from fastapi import *
 from src.users.dependencies import auth_user
 from src.users.routers import router as users_routers
 from src.music.__init__ import router as music_router
+from src.user_data.__init__ import router as user_data_routers
 
 app = FastAPI()
 
 app.include_router(users_routers)
+app.include_router(user_data_routers)
 app.include_router(music_router)
 
 @app.get("/")

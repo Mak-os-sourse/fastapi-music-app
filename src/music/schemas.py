@@ -15,13 +15,8 @@ class MusicDataChange(BaseModel):
 class MusicDataGet(BaseModel):
     limit: int = 10
     offset: int = 0
-    """id: int = None
-    title: str = Field(max_length=25, default=None)
-    genre: str = None
-    author_id: int = None
-    release_date: int = None"""
     sorting: list[str] = None
-    where: list[str] = []
+    where: list[str] = None
 
     @field_validator("sorting")
     def check_sorting(cls, value):
@@ -38,6 +33,12 @@ class MusicDataGet(BaseModel):
                 if field not in Music.__table__.columns:
                     raise ValueError("reverse field error")
             else:
-                raise ValueError("error, the string must contain field:revers (str:bool)")
+                raise ValueError("Error, the string must contain field:revers (str:bool)")
+        return value
 
+    @field_validator("where")
+    def check_field(cls, value):
+        for i in value:
+            if "--" in i:
+                raise ValueError("Error, SQL injections are not allowed)")
         return value
