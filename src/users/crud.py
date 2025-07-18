@@ -1,7 +1,6 @@
 from sqlalchemy import select, insert, delete
 
 from src.db import session_db
-from src.users.models import User
 from src.users.schemas import UserDataLogin, UserDataRegist
 from src.users.models import User
 

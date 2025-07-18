@@ -14,6 +14,7 @@ async def router_create_music(upload_file: UploadFile = File(), music_data_creat
     if user is not None:
 
         music = add_music(session_db, user_id=user.id, title=music_data_create.title, genre=music_data_create.genre, info=music_data_create.info)
+
         with open(f"static/api/music/{music.id}.mp3", "wb") as file:
             file.write(await upload_file.read())
         return music

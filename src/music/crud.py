@@ -8,6 +8,7 @@ def add_music(session_db, user_id: int, title: str, genre: str, info: str) -> Mu
                                 genre=genre,
                                 author_id=user_id,
                                 info=info,
+                                format_file="",
                                 release_date=datetime.now(timezone.utc).timestamp(),
                                 listing=0).returning(Music)
     result = session_db.scalars(stmt).one_or_none()
@@ -20,23 +21,28 @@ def get_music(session_db,
               limit: int = 10,
               sorting: list[tuple[str, bool]] = None,
               ) -> list[Music] | None:
+    list_where = []
+
     if where == []:
         where.append(1 == 1)
+    else:
+        for i in where:
+            list_where.append(text(i))
 
     sorting_fields = []
 
-    for i in sorting:
-        field = i[0]
-        reverse = i[1]
-        if reverse is True:
-            sorting_fields.append(asc(field))
-        if reverse is False:
-            sorting_fields.append(desc(field))
+    if sorting is not None:
+        for i in sorting:
+            field = i[0]
+            reverse = i[1]
+            if reverse is True:
+                sorting_fields.append(asc(field))
+            if reverse is False:
+                sorting_fields.append(desc(field))
 
-    if sorting_fields != []:
-        stmt = select(Music).order_by(*sorting_fields).where(text(*where)).limit(limit).offset(offset)
+        stmt = select(Music).order_by(*sorting_fields).where(*list_where).limit(limit).offset(offset)
     else:
-        stmt = select(Music).where(*where).limit(limit).offset(offset)
+        stmt = select(Music).where(*list_where).limit(limit).offset(offset)
 
     data = session_db.scalars(stmt)
     return data.fetchall()

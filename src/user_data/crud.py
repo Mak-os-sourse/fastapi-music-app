@@ -1,21 +1,33 @@
+from datetime import datetime, timezone
+
+import sqlalchemy.exc
 from sqlalchemy import *
 
-from src.user_data.models import *
+def add_activity(session_db, table, music_id: int, user_id: int):
+    stmt = insert(table).values(user_id=user_id, music_id=music_id, release_date=datetime.now(timezone.utc).timestamp()).returning(table)
 
-def add_activity(session_db, table: str, music_id: int, user_id: int):
-    stmt = insert(table).values(user_id=user_id, music_id=music_id).returning(table)
+    result = session_db.scalars(stmt).one_or_none()
+    session_db.commit()
 
-    result = session_db.scalars()
-    return result.one_or_none()
+    return result
 
-def get_activity(session_db, table: str, user_id: int):
-    stmt = select(table).where(user_id == "user_id")
+def get_activity(session_db, table, offset: int = 0, limit: int = 10, fields: list = None):
+    list_where = []
 
-    result = session_db.scalars()
-    return result.one_or_none()
+    for i in fields:
+        list_where.append(text(i))
 
-def delete_activity(session_db, table: str, user_id: int = None, music_id: int = None):
-    stmt = delete(table).where("user_id" == user_id, music_id == "music_id")
+    stmt = select(table).offset(offset).limit(limit).where(*list_where)
 
-    result = session_db.scalars()
-    return result.one_or_none()
+    result = session_db.scalars(stmt)
+    return result.all()
+
+def delete_activity(session_db, table, **where):
+    list_where = []
+    for key, value in where.items():
+        list_where.append(text(f"{key} == '{value}'"))
+
+    stmt = delete(table).where(*list_where)
+
+    result = session_db.scalars(stmt)
+    session_db.commit()
