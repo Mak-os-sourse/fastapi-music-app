@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "app",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/app/app.py",
+            "console": "integratedTerminal",
+            "env": {"PYTHONPATH": "${workspaceFolder}"}
+        }
+    ]
+}
